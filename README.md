@@ -8,7 +8,7 @@ Generate markdown from Python sources (reST based)
 
 ## Usage
 
-```python
+```bash
 python -m frangidoc -m <module_name> -o /path/to/output/file.md
 ```
 
