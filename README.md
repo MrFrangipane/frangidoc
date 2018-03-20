@@ -2,6 +2,9 @@
 
 Generate markdown from Python sources (reST based)
 
+!!! example
+    test d'example hein
+
 ## References
 
 Largely inspired from
