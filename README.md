@@ -2,6 +2,16 @@
 
 Generate markdown from Python sources (reST based)
 
+## Installation
+
+`pip install git+https://github.com/MrFrangipane/docgen.git`
+
+## Usage
+
+```python
+python -m frangidoc -m <module_name> -o /path/to/output/file.md
+```
+
 ## Example
 
 The following source renders as [this page](demo-output.md)
