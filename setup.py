@@ -4,10 +4,10 @@ from setuptools import setup, find_packages
 
 
 NAME = 'frangidoc'
-VERSION = '0.0.0'
+VERSION = '0.1.0'
 DESCRIPTION = 'Generate markdown from Python sources (reST based)'
 AUTHOR = 'Valentin Moriceau'
-AUTHOR_EMAIL = 'v.moriceau@cube-creative.com'
+AUTHOR_EMAIL = 'valentin.moriceau@free.com'
 
 _here = path.abspath(path.dirname(__file__))
 _readme_filepath = path.join(_here, 'README.md')

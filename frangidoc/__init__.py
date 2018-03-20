@@ -1,8 +1,5 @@
 """
-Largely inspired from
-- https://medium.com/python-pandemonium/python-introspection-with-the-inspect-module-2c85d5aa5a48
-- https://gist.github.com/dvirsky/30ffbd3c7d8f37d4831b30671b681c24
-Many thanks to their respective authors
+
 """
 import os
 import sys
@@ -150,12 +147,14 @@ def genereate(module_name):
         module = pydoc.safeimport(module_name)
 
         if module is None:
-            print("Module not found")
+            print("Module '%s' not found" % module_name)
+            return
 
         return get_markdown(module)
 
-    except pydoc.ErrorDuringImport:
-        print("Error while trying to import %s" % module_name)
+    except pydoc.ErrorDuringImport, e:
+        print("Error while trying to import '%s' :" % module_name)
+        print(e)
 
 
 def generate_and_save(module_name, output_filepath):
@@ -241,7 +240,3 @@ def get_classes(item):
         output.extend(get_classes(class_))
 
     return output
-
-
-if __name__ == '__main__':
-    generate_and_save("tubemetadata2", os.getcwd() + "/test.md")
