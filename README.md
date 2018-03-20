@@ -4,6 +4,8 @@ Generate markdown from Python sources (reST based)
 
 ## Example
 
+The following source renders as [this page](demo-output.md)
+
 ### Python source
 
 ```python
