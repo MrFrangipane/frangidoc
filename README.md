@@ -71,7 +71,7 @@ def some_function(one_param):
 
 ### Markdown Output
 
-```markdown
+````markdown
 # Demo
 
 Top module docstring
@@ -148,7 +148,7 @@ It can be multiline and use markdown too
 ---
 
 Thank you
-```
+````
 
 ## References
 
