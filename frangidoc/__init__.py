@@ -135,35 +135,53 @@ def _format_docstring(docstring):
     return output
 
 
-def genereate(module_name):
+def get_module(module_name):
     try:
         working_dir = os.getcwd()
         if working_dir not in sys.path:
             sys.path.append(working_dir)
 
         module = pydoc.safeimport(module_name)
+        print("Imported '%s'" % module_name)
 
         if module is None:
             print("Module '%s' not found" % module_name)
             return
 
-        return get_markdown(module)
+        return module
 
     except pydoc.ErrorDuringImport, e:
         print("Error while trying to import '%s' :" % module_name)
         print(e)
 
 
-def generate_and_save(module_name, output_filepath):
-    content = genereate(module_name)
+def make_output_filepath(module):
+    filepath = module.__file__
+    filepath, ext = os.path.splitext(filepath)
 
-    if content is None: return
+    if filepath.endswith('__init__'):
+        filepath = filepath.replace('__init__', module.__name__)
+
+    return filepath + ".md"
+
+def generate_and_save(module_name, output_filepath=None):
+    module = get_module(module_name)
+
+    if module is None: return
+
+    if output_filepath is None:
+        output_filepath = make_output_filepath(module)
+
+    content = get_markdown(module)
 
     with open(output_filepath, "w+") as content_file:
         content_file.write(content)
 
+    print("Output file written : %s" % output_filepath)
+
 
 def get_markdown(module):
+    print("Generating markdown from %s" % module.__file__)
     output = _module_header(module)
 
     doc = pydoc.inspect.getdoc(module)
@@ -194,6 +212,8 @@ def get_functions(item):
 
     for function_name, function in pydoc.inspect.getmembers(item, _is_function_or_method):
         if function_name.startswith("_") and function_name != '__init__': continue
+
+        print(" -> generating Markdown for function : %s" % function_name)
 
         output.extend(_function_header(function, parent=item))
         output.extend(_function_signature(function, parent=item))
@@ -227,6 +247,7 @@ def get_classes(item):
     for class_name, class_ in pydoc.inspect.getmembers(item, pydoc.inspect.isclass):
         if class_name.startswith("_"): continue
 
+        print(" -> generating Markdown for class : %s" % class_name)
         output.extend(_class_header(class_, parent=item))
 
         doc = pydoc.inspect.getdoc(class_)
