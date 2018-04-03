@@ -25,11 +25,17 @@ def generate_and_save(module_name, output_filepath=None):
 
 
 def clone_and_generate(repository_url, output_directory):
+    # TODO : range moi ca !
     repo_name = os.path.basename(repository_url).replace('.git', '')
     temp_folder = tempfile.mkdtemp(prefix="frangidoc-{}.".format(repo_name))
     config_filepath = os.path.join(temp_folder, '.frangidoc.yml')
 
-    git.Repo.clone_from(repository_url, temp_folder)
+    try:
+        git.Repo.clone_from(repository_url, temp_folder)
+    except git.GitCommandError, e:
+        logging.warn("Impossible to clone {repo_url}".format(repo_url=repository_url))
+        logging.warn(e)
+        return False
 
     logging.info("Cloned {repo_url} to {temp_folder}".format(repo_url=repository_url, temp_folder=temp_folder))
 
@@ -76,3 +82,5 @@ def clone_and_generate(repository_url, output_directory):
 
     sys.path = copy.deepcopy(sys_path_backup)
     os.environ = environment_backup
+
+    return True
