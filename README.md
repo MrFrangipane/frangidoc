@@ -22,7 +22,7 @@ python -m frangidoc module <module_name> [-o output_file.md]
 
 It is possible to generate markdown from a distant repository.
 
-This repo must have a `.frangidoc.yml` file at its root, describing the modules to be parsed :
+This repo must have a `.frangidoc.yml` file at its root, describing the modules/packages to be parsed :
 
 It is possible to alter the environment before generation.
 
