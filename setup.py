@@ -4,7 +4,7 @@ from setuptools import setup, find_packages
 
 
 NAME = 'frangidoc'
-VERSION = '0.2.0'
+VERSION = '1.0.0'
 DESCRIPTION = 'Generate markdown from Python sources (reST based)'
 AUTHOR = 'Valentin Moriceau'
 AUTHOR_EMAIL = 'valentin.moriceau@free.com'

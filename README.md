@@ -1,6 +1,6 @@
 # Frangidoc
 
-Generate markdown from Python sources (reST based)
+Generate markdown from reST based Python docstrings
 
 ## Installation
 
@@ -8,8 +8,34 @@ Generate markdown from Python sources (reST based)
 
 ## Usage
 
+### Module
+
 ```bash
-python -m frangidoc <module_name> -o </path/to/output/file.md>
+python -m frangidoc module <module_name> [-o output_file.md]
+```
+
+### Git
+
+```bash
+python -m frangidoc git <repo_url> <output_dir>
+```
+
+## Git
+
+It is possible to generate markdown from a distant repository.
+
+This repo must have a `.frangidoc.yml` file at its root, describing the modules to be parsed :
+
+It is possible to alter the environment before generation.
+
+```yml
+title: The Title
+environment:
+  PYTHONPATH: some/path;some/other/path
+  SOME_ENV_VAR: some_value
+modules:
+  - path/to/module.py
+  - path/to/other_module.py
 ```
 
 ## Example
@@ -168,5 +194,6 @@ Largely inspired from
 
 - https://medium.com/python-pandemonium/python-introspection-with-the-inspect-module-2c85d5aa5a48
 - https://gist.github.com/dvirsky/30ffbd3c7d8f37d4831b30671b681c24
+- https://chase-seibert.github.io/blog/2014/03/21/python-multilevel-argparse.html
 
 Many thanks to their respective authors
