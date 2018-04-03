@@ -69,7 +69,7 @@ def clone_and_generate(repository_url, output_directory):
 
     sys_path_inter_backup = copy.deepcopy(sys.path)
 
-    for module_filepath in config['modules']:
+    for module_filepath in config.get('modules', list()):
         relative_path, filename = os.path.split(module_filepath)
         path = os.path.join(temp_folder, relative_path)
         name = filename.replace('.py', '')
