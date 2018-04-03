@@ -8,19 +8,17 @@ Generate markdown from reST based Python docstrings
 
 ## Usage
 
-### Module
+FrangiDoc is a command line tool
+
+### By module
+
+You can generate markdown files locally by giving a module name
 
 ```bash
 python -m frangidoc module <module_name> [-o output_file.md]
 ```
 
-### Git
-
-```bash
-python -m frangidoc git <repo_url> <output_dir>
-```
-
-## Git
+### With Git
 
 It is possible to generate markdown from a distant repository.
 
@@ -38,7 +36,13 @@ modules:
   - path/to/other_module.py
 ```
 
-## Example
+```bash
+python -m frangidoc git <repo_url> <output_dir>
+```
+
+Each given module will be parsed and a respective .md file will be created in the given output folder
+
+## Syntax Examples
 
 The following source renders as [this page](demo-output.md)
 
