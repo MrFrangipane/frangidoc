@@ -33,7 +33,7 @@ environment:
   SOME_ENV_VAR: some_value
 modules:
   - path/to/module.py
-  - path/to/other_module.py
+  - path/to/package/__init__.py
 ```
 
 ```bash
