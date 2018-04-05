@@ -1,12 +1,23 @@
 import os
 import sys
 import copy
+import stat
+import errno
 import shutil
 import logging
 import tempfile
 import generator
 import git
 import yaml
+
+
+def _handle_remove_read_only(func, path, exc):
+  excvalue = exc[1]
+  if func in (os.rmdir, os.remove) and excvalue.errno == errno.EACCES:
+      os.chmod(path, stat.S_IRWXU| stat.S_IRWXG| stat.S_IRWXO) # 0777
+      func(path)
+  else:
+      raise
 
 
 def generate_and_save(module_name, output_filepath=None):
@@ -32,7 +43,7 @@ def clone_and_generate(repository_url, output_directory, cleanup=True):
     config_filepath = os.path.join(temp_folder, '.frangidoc.yml')
 
     try:
-        git.Repo.clone_from(repository_url, temp_folder)
+        repo = git.Repo.clone_from(repository_url, temp_folder)
     except git.GitCommandError, e:
         logging.warn("Impossible to clone {repo_url}".format(repo_url=repository_url))
         logging.warn(e)
@@ -85,6 +96,6 @@ def clone_and_generate(repository_url, output_directory, cleanup=True):
     os.environ = environment_backup
 
     if cleanup:
-        shutil.rmtree(temp_folder)
+        shutil.rmtree(temp_folder, ignore_errors=False, onerror=_handle_remove_read_only)
 
     return True
