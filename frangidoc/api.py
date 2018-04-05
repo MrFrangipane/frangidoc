@@ -1,6 +1,7 @@
 import os
 import sys
 import copy
+import shutil
 import logging
 import tempfile
 import generator
@@ -24,7 +25,7 @@ def generate_and_save(module_name, output_filepath=None):
     logging.info("Output file written : %s" % output_filepath)
 
 
-def clone_and_generate(repository_url, output_directory):
+def clone_and_generate(repository_url, output_directory, cleanup=True):
     # TODO : range moi ca !
     repo_name = os.path.basename(repository_url).replace('.git', '')
     temp_folder = tempfile.mkdtemp(prefix="frangidoc-{}.".format(repo_name))
@@ -82,5 +83,8 @@ def clone_and_generate(repository_url, output_directory):
 
     sys.path = copy.deepcopy(sys_path_backup)
     os.environ = environment_backup
+
+    if cleanup:
+        shutil.rmtree(temp_folder)
 
     return True
