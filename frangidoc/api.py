@@ -85,9 +85,14 @@ def clone_and_generate(repository_url, output_directory, cleanup=True):
         relative_path, filename = os.path.split(module_filepath)
         path = os.path.join(temp_folder, relative_path)
         name = filename.replace('.py', '')
+
+        if name == '__init__':
+            name = os.path.basename(relative_path)
+            path = os.path.dirname(path)
+
         output_filename = os.path.join(output_folder, name + '.md')
 
-        sys.path.append(path)
+        sys.path.insert(0, path)
         generate_and_save(name, output_filename)
 
         sys.path = copy.deepcopy(sys_path_inter_backup)
