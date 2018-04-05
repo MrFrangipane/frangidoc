@@ -4,7 +4,7 @@ from setuptools import setup, find_packages
 
 
 _NAME = 'frangidoc'
-_VERSION = '1.1.3'
+_VERSION = '1.1.4'
 _DESCRIPTION = 'Generate markdown from Python sources (reST based)'
 _URL = 'https://github.com/MrFrangipane/frangidoc'
 _AUTHOR = 'Valentin Moriceau'
@@ -12,7 +12,7 @@ _AUTHOR_EMAIL = 'valentin.moriceau@free.com'
 
 _here = path.abspath(path.dirname(__file__))
 
-with open(path.join(_here, 'readme.md'), encoding='utf-8') as readme_file:
+with open(path.join(_here, 'README.md'), encoding='utf-8') as readme_file:
     long_description = readme_file.read()
 
 with open(path.join(_here, "requirements.txt")) as requirements_file:
