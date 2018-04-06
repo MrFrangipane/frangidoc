@@ -105,6 +105,7 @@ def _format_docstring(docstring):
 
     caption = list()
     arguments = list()
+    return_message = ""
 
     for line in lines:
         if line.startswith(':'):
@@ -112,7 +113,8 @@ def _format_docstring(docstring):
             _, arg, role = line.split(':')
 
             if arg == "return":
-                arg = "Returns"
+                return_message = "**Returns :** " + role
+                continue
             else:
                 arg = "`" + arg.replace("param ", "") + "`"
             arguments.append([arg, role])
@@ -124,14 +126,19 @@ def _format_docstring(docstring):
             caption.append(line)
 
     caption = "\n".join(caption)
-
     output.append(caption)
-    output.append("")
-    output.append("| Argument | Role |")
-    output.append("| --- | --- |")
 
-    for argument in arguments:
-        output.append("| %s | %s |" % (argument[0], argument[1]))
+    if arguments:
+        output.append("")
+        output.append("| Argument | Role |")
+        output.append("| --- | --- |")
+
+        for argument in arguments:
+            output.append("| %s | %s |" % (argument[0], argument[1]))
+
+    if return_message:
+        output.append("")
+        output.append(return_message)
 
     return output
 
