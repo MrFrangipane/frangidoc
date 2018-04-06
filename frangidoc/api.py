@@ -126,7 +126,7 @@ def clone_and_generate(repository_url, output_directory, cleanup=True):
         sys.path.insert(0, path)
 
         if name == '__main__':
-            output_filename = os.path.join(output_folder, package_name + '-cli.md')
+            output_filename = os.path.join(output_folder, package_name + ' (CLI).md')
             argparse_and_save(package_name, module_fullpath, output_filename)
 
         else:
