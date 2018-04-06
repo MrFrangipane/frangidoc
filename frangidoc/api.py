@@ -21,6 +21,13 @@ def _handle_remove_read_only(func, path, exc):
       raise
 
 
+def _save(filepath, content):
+    if not os.path.isdir(os.path.dirname(filepath)):
+        os.makedirs(os.path.dirname(filepath))
+    with open(filepath, "w+") as f_file:
+        f_file.write(content)
+
+
 def generate_and_save(module_name, output_filepath=None):
     module = generator.get_module(module_name)
 
@@ -30,20 +37,26 @@ def generate_and_save(module_name, output_filepath=None):
         output_filepath = generator.make_output_filepath(module)
 
     content = generator.get_markdown(module)
-
-    with open(output_filepath, "w+") as content_file:
-        content_file.write(content)
+    _save(output_filepath, content)
 
     logging.info("Output file written : %s" % output_filepath)
 
 
+def _make_pythonpath_envvar():
+    if os.name == 'nt':
+        return ';'.join(sys.path)
+    return ':'.join(sys.path)
+
+
 def argparse_and_save(package_name, module_filepath, output_filepath):
-    logging.info(" -> Generating Markdown for CLI '{}'".format(package_name))
+    logging.info(" -> Generating Markdown from CLI {}".format(package_name))
 
     command = "python {} -h".format(module_filepath)
+    env = os.environ.copy()
+    env['PYTHONPATH'] = _make_pythonpath_envvar()
 
     try:
-        content = subprocess.check_output(command, shell=True)
+        content = subprocess.check_output(command, shell=True, env=env)
     except Exception, e:
         logging.warn("    Error while executing '{}' :".format(command))
         logging.warn(e)
@@ -60,8 +73,8 @@ def argparse_and_save(package_name, module_filepath, output_filepath):
     lines += content.splitlines()
     lines.append('```')
 
-    with open(output_filepath, 'w') as f_markdown:
-        f_markdown.write('\n'.join(lines))
+    content = '\n'.join(lines)
+    _save(output_filepath, content)
 
     logging.info("Output file written : %s" % output_filepath)
 
@@ -105,11 +118,11 @@ def clone_and_generate(repository_url, output_directory, cleanup=True):
         value = value.replace(':', ';')
         logging.info("Adding to {} : {}".format(key, value))
 
+        os.environ[key] = value
+
         if key.upper() == 'PYTHONPATH':
             for path in value.split(';'):
                 sys.path.append(path)
-        else:
-            os.environ[key] = value
 
     sys_path_inter_backup = copy.deepcopy(sys.path)
 
@@ -118,21 +131,25 @@ def clone_and_generate(repository_url, output_directory, cleanup=True):
         relative_path, filename = os.path.split(module_filepath)
         path = os.path.join(temp_folder, relative_path)
         package_name = os.path.basename(relative_path)
+        leaf = '/'.join([step for step in os.path.split(relative_path) if step != ''][1:])
         name = filename.replace('.py', '')
 
-        # Todo deplacer cette logique dans 'generate_and_save()' (pour que l'api soit consitante entre 'git' et 'module')
+        # todo Deplacer cette logique dans 'generate_and_save()'
+        # todo (pour que l'api soit consistante entre 'git' et 'module')
         if name == '__init__':
             name = package_name
+
+        if name in ('__init__', '__main__'):
             path = os.path.dirname(path)
 
         sys.path.insert(0, path)
 
         if name == '__main__':
-            output_filename = os.path.join(output_folder, package_name + ' (CLI).md')
+            output_filename = os.path.join(output_folder, leaf, package_name + ' (CLI).md')
             argparse_and_save(package_name, module_fullpath, output_filename)
 
         else:
-            output_filename = os.path.join(output_folder, name + '.md')
+            output_filename = os.path.join(output_folder, leaf, name + '.md')
             generate_and_save(name, output_filename)
 
         sys.path = copy.deepcopy(sys_path_inter_backup)
@@ -141,6 +158,7 @@ def clone_and_generate(repository_url, output_directory, cleanup=True):
     os.environ = environment_backup
 
     if cleanup:
+        logging.info("Cleaning up {}".format(temp_folder))
         shutil.rmtree(temp_folder, ignore_errors=False, onerror=_handle_remove_read_only)
 
     return True
