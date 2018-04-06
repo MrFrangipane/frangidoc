@@ -45,7 +45,7 @@ def argparse_and_save(package_name, module_filepath, output_filepath):
     try:
         content = subprocess.check_output(command)
     except Exception, e:
-        logging.warn("    Error while executing {}".format(command))
+        logging.warn("    Error while executing '{}' :".format(command))
         logging.warn(e)
         return
 
@@ -113,11 +113,13 @@ def clone_and_generate(repository_url, output_directory, cleanup=True):
 
     for module_filepath in config.get('modules', list()):
         module_fullpath = os.path.join(temp_folder, module_filepath)
+        print module_fullpath, os.path.isfile(module_fullpath)
         relative_path, filename = os.path.split(module_filepath)
         path = os.path.join(temp_folder, relative_path)
         package_name = os.path.basename(relative_path)
         name = filename.replace('.py', '')
 
+        # Todo deplacer cette logique dans 'generate_and_save()' (pour que l'api soit consitante entre 'git' et 'module')
         if name == '__init__':
             name = package_name
             path = os.path.dirname(path)
