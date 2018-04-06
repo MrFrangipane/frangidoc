@@ -113,7 +113,6 @@ def clone_and_generate(repository_url, output_directory, cleanup=True):
 
     for module_filepath in config.get('modules', list()):
         module_fullpath = os.path.join(temp_folder, module_filepath)
-        print module_fullpath, os.path.isfile(module_fullpath)
         relative_path, filename = os.path.split(module_filepath)
         path = os.path.join(temp_folder, relative_path)
         package_name = os.path.basename(relative_path)
