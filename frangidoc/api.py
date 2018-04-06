@@ -43,7 +43,7 @@ def argparse_and_save(package_name, module_filepath, output_filepath):
     command = "python {} -h".format(module_filepath)
 
     try:
-        content = subprocess.check_output(command)
+        content = subprocess.check_output(command, shell=True)
     except Exception, e:
         logging.warn("    Error while executing '{}' :".format(command))
         logging.warn(e)
