@@ -93,7 +93,7 @@ def clone_and_generate(repository_url, output_directory, cleanup=True):
     output_folder = os.path.join(output_directory, config['title'])
 
     if os.path.isdir(output_folder):
-        shutil.rmtree(output_folder)
+        shutil.rmtree(output_folder, ignore_errors=False, onerror=_handle_remove_read_only)
 
     os.makedirs(output_folder)
 
