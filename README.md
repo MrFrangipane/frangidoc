@@ -4,7 +4,7 @@ Generate markdown from reST based Python docstrings
 
 ## Installation
 
-`pip install git+https://github.com/MrFrangipane/docgen.git`
+`pip install frangidoc`
 
 ## Usage
 
