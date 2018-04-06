@@ -92,8 +92,10 @@ def clone_and_generate(repository_url, output_directory, cleanup=True):
 
     output_folder = os.path.join(output_directory, config['title'])
 
-    if not os.path.isdir(output_folder):
-        os.makedirs(output_folder)
+    if os.path.isdir(output_folder):
+        shutil.rmtree(output_folder)
+
+    os.makedirs(output_folder)
 
     sys_path_backup = copy.deepcopy(sys.path)
     environment_backup = copy.deepcopy(os.environ)
