@@ -1,6 +1,7 @@
 import os
 import sys
 import pydoc
+import inspect
 import logging
 
 
@@ -200,13 +201,24 @@ def get_markdown(module):
     return "\n".join([str(item) for item in output])
 
 
+def _is_foreign(object_, parent):
+    try:
+        file_ = inspect.getsourcefile(object_)
+    except TypeError:
+        return True
+
+    return file_ != parent.__file__
+
+
 def get_functions(item):
     output = list()
 
     for function_name, function in pydoc.inspect.getmembers(item, _is_function_or_method):
-        if function_name.startswith("_") and function_name != '__init__': continue
+        logging.info(" => generating Markdown for function : %s" % function_name)
 
-        logging.info(" -> generating Markdown for function : %s" % function_name)
+        if function_name.startswith("_") or _is_foreign(function, parent=item):
+            logging.info("    skipped")
+            continue
 
         output.extend(_function_header(function, parent=item))
         output.extend(_function_signature(function, parent=item))
@@ -215,6 +227,8 @@ def get_functions(item):
         if docstring is not None:
             output.extend(_format_docstring(docstring))
 
+        logging.info("    ok")
+
     return output
 
 
@@ -222,7 +236,11 @@ def get_methods(class_):
     output = list()
 
     for method_name, method in pydoc.inspect.getmembers(class_, _is_function_or_method):
-        if method_name.startswith("_") and method_name != '__init__': continue
+        logging.info(" -> generating Markdown for method : %s.%s" % (class_.__name__, method_name))
+
+        if method_name.startswith("_") and method_name != '__init__':
+            logging.info("    skipped")
+            continue
 
         output.extend(_method_header(method, parent=class_))
         output.extend(_method_signature(method, parent=class_))
@@ -231,16 +249,21 @@ def get_methods(class_):
         if docstring is not None:
             output.extend(_format_docstring(docstring))
 
+        logging.info("    ok")
+
     return output
 
 
 def get_classes(item):
     output = list()
 
-    for class_name, class_ in pydoc.inspect.getmembers(item, pydoc.inspect.isclass):
-        if class_name.startswith("_"): continue
+    for class_name, class_ in inspect.getmembers(item, inspect.isclass):
+        logging.info(" => generating Markdown for class : %s" % class_name)
 
-        logging.info(" -> generating Markdown for class : %s" % class_name)
+        if class_ is None or class_name.startswith("_") or _is_foreign(class_, parent=item):
+            logging.info("    skipped")
+            continue
+
         output.extend(_class_header(class_, parent=item))
 
         doc = pydoc.inspect.getdoc(class_)
@@ -249,5 +272,7 @@ def get_classes(item):
 
         output.extend(get_methods(class_))
         output.extend(get_classes(class_))
+
+        logging.info("    ok")
 
     return output
