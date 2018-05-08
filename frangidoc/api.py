@@ -7,9 +7,9 @@ import shutil
 import logging
 import tempfile
 import subprocess
-import generator
 import git
 import yaml
+from frangidoc import generator
 
 
 def _handle_remove_read_only(func, path, exc):
@@ -57,9 +57,9 @@ def argparse_and_save(package_name, module_filepath, output_filepath):
 
     try:
         content = subprocess.check_output(command, shell=True, env=env)
-    except Exception, e:
-        logging.warn("    Error while executing '{}' :".format(command))
-        logging.warn(e)
+    except Exception as e:
+        logging.warning("    Error while executing '{}' :".format(command))
+        logging.warning(e)
         return
 
     lines = [
@@ -87,15 +87,15 @@ def clone_and_generate(repository_url, output_directory, cleanup=True):
 
     try:
         git.Repo.clone_from(repository_url, temp_folder)
-    except git.GitCommandError, e:
-        logging.warn("Impossible to clone {repo_url}".format(repo_url=repository_url))
-        logging.warn(e)
+    except git.GitCommandError as e:
+        logging.warning("Impossible to clone {repo_url}".format(repo_url=repository_url))
+        logging.warning(e)
         return False
 
     logging.info("Cloned {repo_url} to {temp_folder}".format(repo_url=repository_url, temp_folder=temp_folder))
 
     if not os.path.isfile(config_filepath):
-        logging.warn("Could not find .frangidoc.yml, aborting")
+        logging.warning("Could not find .frangidoc.yml, aborting")
         return False
 
     with open(config_filepath, 'r') as f_config:
@@ -114,7 +114,7 @@ def clone_and_generate(repository_url, output_directory, cleanup=True):
     environment_backup = copy.deepcopy(os.environ)
 
     environment = config.get('environment', dict())
-    for key, value in environment.iteritems():
+    for key, value in environment.items():
         value = value.replace(':', ';')
         logging.info("Adding to {} : {}".format(key, value))
 

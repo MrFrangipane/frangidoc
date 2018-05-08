@@ -1,1 +1,1 @@
-from api import *
+from frangidoc.api import *

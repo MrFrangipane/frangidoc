@@ -4,7 +4,7 @@ from setuptools import setup, find_packages
 
 
 _NAME = 'frangidoc'
-_VERSION = '1.3.2'
+_VERSION = '1.4.0'
 _DESCRIPTION = 'Generate markdown from Python sources (reST based)'
 _URL = 'https://github.com/MrFrangipane/frangidoc'
 _AUTHOR = 'Valentin Moriceau'
@@ -13,6 +13,7 @@ _KEYWORDS = 'documentation markdown docstring reST'
 _CLASSIFIERS = [
     'Development Status :: 3 - Alpha',
     'Programming Language :: Python :: 2.7',
+    'Programming Language :: Python :: 3',
     'Intended Audience :: Developers',
     'Intended Audience :: System Administrators',
     'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',

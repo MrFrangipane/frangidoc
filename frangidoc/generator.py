@@ -159,9 +159,9 @@ def get_module(module_name):
 
         return module
 
-    except pydoc.ErrorDuringImport, e:
-        logging.warn("Error while trying to import '%s' :" % module_name)
-        logging.warn(e)
+    except pydoc.ErrorDuringImport as e:
+        logging.warning("Error while trying to import '%s' :" % module_name)
+        logging.warning(e)
 
 
 def make_output_filepath(module):

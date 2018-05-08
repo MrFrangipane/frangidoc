@@ -1,7 +1,7 @@
 import sys
 import logging
 import argparse
-import api
+from frangidoc import api
 
 
 USAGE = """frangidoc <command> [<args>]
