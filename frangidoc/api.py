@@ -157,6 +157,15 @@ def clone_and_generate(repository_url, output_directory, cleanup=True):
     sys.path = copy.deepcopy(sys_path_backup)
     os.environ = environment_backup
 
+    for markdown_filepath in config.get('markdown', list()):
+        fullpath = os.path.join(temp_folder, markdown_filepath)
+
+        if not os.path.isfile(fullpath):
+            logging.info("File not found {}".format(markdown_filepath))
+
+        output = os.path.join(output_folder, markdown_filepath)
+        shutil.copy2(fullpath, output)
+
     if cleanup:
         logging.info("Cleaning up {}".format(temp_folder))
         shutil.rmtree(temp_folder, ignore_errors=False, onerror=_handle_remove_read_only)

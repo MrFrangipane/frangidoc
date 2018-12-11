@@ -34,6 +34,8 @@ environment:
 modules:
   - path/to/module.py
   - path/to/package/__init__.py
+markdown:
+  - path/to/markdown.md
 ```
 
 ```bash
