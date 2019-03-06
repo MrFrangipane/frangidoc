@@ -6,7 +6,7 @@ from frangidoc.renderer import render
 if __name__ == '__main__':
     logging.getLogger().setLevel(logging.INFO)
 
-    filepath = 'R:/users/v.moriceau/tube/api/python/tube.py'
+    filepath = 'R:/users/v.moriceau/tube/api/python/tubepyside.py'
 
     logging.info('parsing ' + filepath)
 

@@ -53,7 +53,9 @@ class Class(_Object):
         self.content = list()
 
     def __str__(self):
-        return '{}({})'.format(self.name, ', '.join(str(a) for a in self.constructor.arguments))
+        if self.constructor is not None:
+            return '{}({})'.format(self.name, ', '.join(str(a) for a in self.constructor.arguments))
+        return '{}()'.format(self.name)
 
 
 class Argument(_Object):
