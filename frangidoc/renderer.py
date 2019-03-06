@@ -1,5 +1,5 @@
 from frangidoc.objects import *
-from frangidoc.parser import parse_module
+
 
 _MODULE = """{title} Module `{name}`
 
@@ -30,6 +30,34 @@ _FUNCTION = """{title} function `{name}`
 """
 
 
+def _render_docstring(docstring, parent, level):
+    lines = docstring.content.splitlines()
+    table = ['| Argument | Role |', '|---|---|']
+    output = list()
+    return_info = list()
+
+    for line in lines:
+        if line.startswith(':param '):
+            name = line[6:].split(':')[0]
+            info = ':'.join(line[6:].split(':')[1:])
+
+            table.append('| `{}` | {} |'.format(name, info))
+
+        elif line.startswith(':return:'):
+            info = line[8:]
+            if info:
+                return_info.append('')
+                return_info.append('**Returns** : {}'.format(info))
+
+        else:
+            output.append(line)
+
+    if len(table) > 2:
+        return '\n'.join(output + table + return_info)
+
+    return '\n'.join(output + return_info)
+
+
 def _title(level):
     """Markdown title"""
     return '#' * (level + 1) + ' '
@@ -39,7 +67,7 @@ def _render_module(module, parent, level):
     """Renders a module to Markdown"""
     title = _title(level)
     name = module.name
-    docstring = module.docstring if module.docstring else ''
+    docstring = render(module.docstring) if module.docstring else ''
     content = '\n'.join(render(item, None, level + 1) for item in module.content)
 
     return _MODULE.format(
@@ -70,7 +98,7 @@ def _render_class(class_, parent, level):
 def _render_function(function, parent, level):
     title = _title(level)
 
-    docstring = function.docstring if function.docstring else ''
+    docstring = render(function.docstring) if function.docstring else ''
     if parent is not None:
         name = parent.name + '.' + str(function)
         signature = parent.name + '.' + str(function)
@@ -95,6 +123,9 @@ def render(item, parent=None, level=0):
 
     if isinstance(item, Function):
         return _render_function(item, parent, level)
+
+    if isinstance(item, Docstring):
+        return _render_docstring(item, parent, level)
 
 
 if __name__ == '__main__':

@@ -28,26 +28,6 @@ class FrangiDoc(object):
         callable_ = getattr(self, args.command)
         callable_()
 
-    def module(self):
-        parser = argparse.ArgumentParser(
-            prog="frangidoc module",
-            description='Generates Markdown from given module name (must be importable)'
-        )
-        parser.add_argument(
-            'module',
-            type=str,
-            help="Module to generate doc from, must be importable"
-        )
-        parser.add_argument(
-            '-o',
-            '--output',
-            type=str,
-            help="Specify output file (same as module if not specified)"
-        )
-        args = parser.parse_args(sys.argv[2:])
-
-        api.generate_and_save(args.module, args.output)
-
     def git(self):
         parser = argparse.ArgumentParser(
             prog="frangidoc git",

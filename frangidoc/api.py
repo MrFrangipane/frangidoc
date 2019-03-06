@@ -9,13 +9,14 @@ import tempfile
 import subprocess
 import git
 import yaml
-from frangidoc import generator
+from frangidoc.parser import parse_module
+from frangidoc.renderer import render
 
 
 def _handle_remove_read_only(func, path, exc):
   excvalue = exc[1]
   if func in (os.rmdir, os.remove) and excvalue.errno == errno.EACCES:
-      os.chmod(path, stat.S_IRWXU| stat.S_IRWXG| stat.S_IRWXO) # 0777
+      os.chmod(path, stat.S_IRWXU | stat.S_IRWXG | stat.S_IRWXO) # 0777
       func(path)
   else:
       raise
@@ -28,16 +29,11 @@ def _save(filepath, content):
         f_file.write(content)
 
 
-def generate_and_save(module_name, output_filepath=None):
-    module = generator.get_module(module_name)
+def generate_and_save(module_filepath, output_filepath=None):
 
-    if module is None: return
-
-    if output_filepath is None:
-        output_filepath = generator.make_output_filepath(module)
-
-    content = generator.get_markdown(module)
-    _save(output_filepath, content)
+    module = parse_module(module_filepath)
+    page = render(module)
+    _save(output_filepath, page)
 
     logging.info("Output file written : %s" % output_filepath)
 
@@ -142,15 +138,13 @@ def clone_and_generate(repository_url, output_directory, cleanup=True):
         if name in ('__init__', '__main__'):
             path = os.path.dirname(path)
 
-        sys.path.insert(0, path)
-
         if name == '__main__':
             output_filename = os.path.join(output_folder, leaf, package_name + ' (CLI).md')
             argparse_and_save(package_name, module_fullpath, output_filename)
 
         else:
             output_filename = os.path.join(output_folder, leaf, name + '.md')
-            generate_and_save(name, output_filename)
+            generate_and_save(module_fullpath, output_filename)
 
         sys.path = copy.deepcopy(sys_path_inter_backup)
 
