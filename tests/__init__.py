@@ -6,7 +6,7 @@ from frangidoc.renderer import render
 if __name__ == '__main__':
     logging.getLogger().setLevel(logging.INFO)
 
-    filepath = 'R:/users/v.moriceau/blender-lab/libs/nomenclature/texture_filepath.py'
+    filepath = 'R:/users/v.moriceau/tube/api/python/tube.py'
 
     logging.info('parsing ' + filepath)
 

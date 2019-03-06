@@ -87,7 +87,8 @@ def parse_arguments(tokens):
             argument.default = new_token.text
 
         elif new_token.type == token.OP and new_token.text in (',', ')'):
-            arguments.append(argument)
+            if argument.name is not None:
+                arguments.append(argument)
             argument = Argument()
 
         if new_token.type == token.OP and new_token.text == ':':
