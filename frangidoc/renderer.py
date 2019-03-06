@@ -126,11 +126,3 @@ def render(item, parent=None, level=0):
 
     if isinstance(item, Docstring):
         return _render_docstring(item, parent, level)
-
-
-if __name__ == '__main__':
-
-    module = parse_module('R:/users/v.moriceau/blender-lab/libs/nomenclature/texture_filepath.py')
-    page = render(module)
-
-    print(page)

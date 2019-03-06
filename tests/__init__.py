@@ -1,28 +1,9 @@
-import unittest
-from frangidoc import parser as p
-from .data import *
+from frangidoc.parser import parse_module
+from frangidoc.renderer import render
 
 
-class Test(unittest.TestCase):
+if __name__ == '__main__':
+    module = parse_module('R:/users/v.moriceau/blender-lab/libs/nomenclature/texture_filepath.py')
+    page = render(module)
 
-    def test_1_empty_file(self):
-        parser = p.Parser([])
-        result = parser.parse()
-
-        self.assertEqual(result, None)
-
-    def test_2_only_blank_lines(self):
-        parser = p.Parser(['', '', ''])
-        result = parser.parse()
-
-        self.assertEqual(result, None)
-
-    def test_3_only_docstring(self):
-        parser = p.Parser(DOCSTRING.splitlines())
-        result = parser.parse()
-
-    def test_4_classes(self):
-        for class_text in CLASSES:
-            print('-' * 50 + '\n' + class_text + '\n\n')
-            parser = p.Parser(class_text.splitlines())
-            print(parser.parse())
+    print(page)
