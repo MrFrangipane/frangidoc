@@ -1,3 +1,4 @@
+import logging
 from frangidoc.objects import *
 
 
@@ -39,6 +40,7 @@ _FUNCTION = """{title} {name}
 
 
 def _render_docstring(docstring, parent, level):
+    logging.info('Rendering docstring : {}'.format(parent.name))
     lines = docstring.content.splitlines()
     table = ['| Argument | Role |', '|---|---|']
     output = list()
@@ -73,10 +75,13 @@ def _title(level):
 
 def _render_module(module, parent, level):
     """Renders a module to Markdown"""
+    logging.info('Rendering module    : {}'.format(module.name))
     title = _title(level)
     name = module.name
-    docstring = render(module.docstring) if module.docstring else ''
+    docstring = render(module.docstring, module) if module.docstring else ''
     content = '\n'.join(render(item, None, level + 2) for item in module.content)
+
+    logging.info('Rendering done      : {}'.format(module.name))
 
     return _MODULE.format(
         title=title,
@@ -88,11 +93,14 @@ def _render_module(module, parent, level):
 
 def _render_class(class_, parent, level):
     """Renders a class to Markdown"""
+    logging.info('Rendering class     : {}'.format(class_.name))
     title = _title(level)
     name = class_.name
     signature = class_
     docstring = class_.docstring if class_.docstring else ''
     content = '\n'.join(render(item, class_, level + 1) for item in class_.content)
+
+    logging.info('Rendering done      : {}'.format(class_.name))
 
     return _CLASS.format(
         title=title,
@@ -104,8 +112,9 @@ def _render_class(class_, parent, level):
 
 
 def _render_function(function, parent, level):
+    logging.info('Rendering function  : {}'.format(function.name))
     title = _title(level)
-    docstring = render(function.docstring) if function.docstring else ''
+    docstring = render(function.docstring, function) if function.docstring else ''
 
     if isinstance(parent, Class):
         class_name = parent.name

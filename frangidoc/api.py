@@ -30,9 +30,13 @@ def _save(filepath, content):
 
 
 def generate_and_save(module_filepath, output_filepath=None):
+    logging.info('Processing file : {}'.format(module_filepath))
 
     module = parse_module(module_filepath)
     page = render(module)
+
+    logging.info('Processing done !')
+
     _save(output_filepath, page)
 
     logging.info("Output file written : %s" % output_filepath)

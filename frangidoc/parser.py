@@ -1,3 +1,4 @@
+import logging
 import os.path
 import token, tokenize
 from objects import *
@@ -115,12 +116,14 @@ def _parse_def(tokens):
             function_.arguments = parse_arguments(tokens)
 
         if new_token.type == token.DEDENT and new_token.e_col <= indent - 4:
+            logging.info('Parsed function  : {}'.format(function_))
             return function_
 
         previous = new_token
 
 
 def _parse_class(tokens):
+    logging.info('New class')
     indent = None
     new_token = Token(tokens.next())
     previous = new_token
@@ -146,6 +149,7 @@ def _parse_class(tokens):
                 new_class.content.append(function_)
 
         if new_token.type == token.DEDENT and new_token.e_col <= indent - 4:
+            logging.info('Parsed class     : {}'.format(new_class))
             return new_class
 
         previous = new_token
@@ -170,6 +174,7 @@ def _parse_module(tokens, module):
 
         previous_type = new_token.type
 
+    logging.info('Parsed module    : {}'.format(module))
     return module
 
 
