@@ -10,14 +10,6 @@ Generate markdown from reST based Python docstrings
 
 FrangiDoc is a command line tool
 
-### By module
-
-You can generate markdown files locally by giving a module name
-
-```bash
-python -m frangidoc module <module_name> [-o output_file.md]
-```
-
 ### With Git
 
 It is possible to generate markdown from a distant repository.
@@ -58,16 +50,6 @@ You can use markdown here
 - A bullet
 - list
 - for example
-"""
-
-
-DISCLAIMER = """If there is a `DISCLAIMER` member in the module, it is put at the end of the Markdown document
-
-It can be multiline and use markdown too
-
----
-
-Thank you
 """
 
 
@@ -182,16 +164,6 @@ Explain what happens here
 | --- | --- |
 | `one_param` |  Argument one **must be** something in bold |
 | Returns |  None |
-
----
-
-If there is a `DISCLAIMER` member in the module, it is put at the end of the Markdown document
-
-It can be multiline and use markdown too
-
----
-
-Thank you
 ````
 
 ## References
