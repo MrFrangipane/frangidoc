@@ -68,7 +68,7 @@ def _render_module(module, parent, level):
     title = _title(level)
     name = module.name
     docstring = render(module.docstring) if module.docstring else ''
-    content = '\n'.join(render(item, None, level + 1) for item in module.content)
+    content = '\n'.join(render(item, None, level + 2) for item in module.content)
 
     return _MODULE.format(
         title=title,
