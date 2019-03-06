@@ -1,178 +1,184 @@
-class Docstring(object):
-    def __init__(self):
-        self.content = None
-
-    def __repr__(self):
-        return "<Docstring {}>".format(self.content.splitlines()[0])
-
-
-class Object(object):
-    def __init__(self):
-        self.name = None
-        self.signature = None
-        self.docstring = None
-        self.content = None
-        self.indentation = None
-
-    def __repr__(self):
-        return "<{} '{}'>".format(self.__class__.__name__, self.name)
-
-
-class Module(Object):
-    pass
-
-
-class Class(Object):
-    pass
-
-
-class Constructor(Object):
-    pass
-
-
-class Function(Object):
-    pass
-
-
-class Method(Object):
-    pass
-
-
-class _Line(object):
-    """Stores stripped line text, indentation as int, number as int"""
-    def __init__(self, text_line):
-        self.text = text_line.strip()
-        self.number = 0
-        self.indentation = len(text_line) - len(text_line.lstrip(' '))
-
-    def __repr__(self):
-        return "<Line({:04d}:{} indent={:02d})>".format(
-            self.number,
-            self.text,
-            self.indentation
-        )
-
-    @staticmethod
-    def from_raw_lines(text_lines):
-        """
-        Parses all the text lines, and determines indentation's space count
-        :param text_lines: list of raw text lines
-        :return:  list of _Line objects
-        """
-        space_count = 0
-        lines = list()
-
-        for line_number, text_line in enumerate(text_lines):
-            line = _Line(text_line)
-            line.number = line_number
-            if line.indentation > space_count and space_count == 0:
-                space_count = line.indentation
-
-            lines.append(line)
-
-        for line in lines:
-            line.indentation = line.indentation // space_count if space_count else 0
-
-        return lines
+import os.path
+import token, tokenize
+from objects import *
 
 
 class Token(object):
-    BEGIN = 'TOKEN_BEGIN'
-    END = 'TOKEN_END'
-    INDENT_BEGIN = 'TOKEN_INDENT_BEGIN'
-    INDENT_END = 'TOKEN_INDENT_END'
-    DOCSTRING_SIMPLE = 'TOKEN_DOCSTRING_SIMPLE'
-    DOCSTRING_DOUBLE = 'TOKEN_DOCSTRING_DOUBLE'
-    DECORATOR = 'TOKEN_DECORATOR'
-    CLASS = 'TOKEN_CLASS'
-    INIT = 'TOKEN_INIT'
-    DEF = 'TOKEN_DEF'
+    """
+    Holds Token information
+    """
+    def __init__(self, infos=None):
+        if infos:
+            self.type = infos[0]
+            self.text = infos[1]
+            self.s_line, self.s_col = infos[2]
+            self.e_line, self.e_col = infos[3]
+            self.line_text = infos[4]
+            # print(self)
+        else:
+            self.type = None
+            self.type = None
+            self.text = None
+            self.s_line = None
+            self.s_col = None
+            self.e_line = None
+            self.e_col = None
+            self.line_text = None
 
-    EXPECTED = {
-        BEGIN: (DOCSTRING_SIMPLE, DOCSTRING_DOUBLE, CLASS, DEF, END)
-    }
+    def __str__(self):
+        return "%10s %-14s %-20r %r" % (
+            tokenize.tok_name.get(self.type, self.type),
+            "%d.%d-%d.%d" % (self.s_line, self.s_col, self.e_line, self.e_col),
+            self.text, self.line_text
+        )
+
+    def __repr__(self):
+        return '<Token({})>'.format(str(self))
 
 
-class Parser(object):
+def _strip(text, quotes=False):
+    """
+    Strips indentation and quotes
+    """
+    text_ = ""
 
-    def __init__(self, text_lines):
-        self.lines = _Line.from_raw_lines(text_lines)
-        if self.lines:
-            self._index = 0
-            self._line = self.lines[0]
-            self._token = Token.BEGIN
-            self._indentation = 0
-        self.result = None
+    for line in text.splitlines():
+        line_ = line.strip()
+        if quotes:
+            line_ = line_.strip('"').strip("'")
 
-    #
-    # Navigation
-    def consume(self):
-        """
-        Updates indentation and line
-        """
-        if self._index > 0:
-            self._indentation = self._line.indentation
+        text_ += line_ + '\n'
 
-        self._index += 1
+    return text_
 
-        if self._index > len(self.lines) - 1:
-            return False
 
-        self._line = self.lines[self._index]
-        return True
+def _parse_class_parents(tokens):
+    parents = list()
+    parent = list()
 
-    #
-    # Parsing
-    def token(self, line, current_indentation):
-        """
-        Returns the corresponding token for given line at current_index
-        :param line: _Line object
-        :param current_indentation: level of indentation before given _Line
-        :param current_index: index of given
-        :return:
-        """
-        if line.indentation > current_indentation:
-            return Token.INDENT_BEGIN
+    for infos in tokens:
+        new_token = Token(infos)
 
-        elif line.indentation < current_indentation:
-            return Token.INDENT_END
+        if new_token.type == token.NAME:
+            parent.append(new_token.text)
 
-        if line.content.startswith('"""'):
-            return Token.DOCSTRING_DOUBLE
+        if new_token.type == token.OP and new_token.text in (',', ')'):
+            parents.append('.'.join(parent))
+            parent = list()
 
-        if line.content.startswith("'''"):
-            return Token.DOCSTRING_SIMPLE
+        if new_token.type == token.OP and new_token.text == ':':
+            break
 
-        if line.content.startswith('@'):
-            return Token.DECORATOR
+    return parents
 
-        if line.content.startswith('class '):
-            return Token.CLASS
 
-        if line.content.replace(' ', '').startswith('def__init__'):
-            return Token.INIT
+def parse_arguments(tokens):
+    arguments = list()
+    argument = Argument()
 
-        if line.content.startswith('def '):
-            return Token.DEF
+    for infos in tokens: # TODO : _parse_value to deal with arg=[None, 1] for example
+        new_token = Token(infos)
 
-        if line.number == len(self.lines) - 1:  # todo : ??
-            return Token.END
+        if new_token.type == token.NAME and not argument.name:
+            argument.name = new_token.text
 
-    def next_token(self):
-        while True:
-            if self._line.text:
-                break
-            if not self.consume():
-                break
+        elif new_token.type in (token.NUMBER, token.STRING, token.NAME) and argument.name:
+            argument.default = new_token.text
 
-        print(self._line)
+        elif new_token.type == token.OP and new_token.text in (',', ')'):
+            arguments.append(argument)
+            argument = Argument()
 
-    def parse(self):
-        """
-        Parses the given text_lines
-        :return: Objects, None otherwise
-        """
-        if self.lines:
-            self.next_token()
+        if new_token.type == token.OP and new_token.text == ':':
+            break
 
-        return self.result
+    return arguments
+
+
+def _parse_def(tokens):
+    indent = None
+    previous = Token()
+    function_ = Function()
+
+
+    for infos in tokens:
+        new_token = Token(infos)
+
+        if new_token.type == token.STRING and previous.type == token.INDENT:
+            function_.docstring = Docstring(_strip(new_token.line_text, quotes=True))
+
+        if new_token.type == token.INDENT and indent is None:
+            indent = new_token.e_col
+
+        if new_token.type == token.NAME and not function_.name:
+            function_.name = new_token.text
+            function_.arguments = parse_arguments(tokens)
+
+        if new_token.type == token.DEDENT and new_token.e_col <= indent - 4:
+            return function_
+
+        previous = new_token
+
+
+def _parse_class(tokens):
+    indent = None
+    new_token = Token(tokens.next())
+    previous = new_token
+
+    new_class = Class()
+    new_class.name = new_token.text
+    new_class.parents = _parse_class_parents(tokens)
+
+    for infos in tokens:
+        new_token = Token(infos)
+
+        if new_token.type == token.INDENT and indent is None:
+            indent = new_token.e_col
+
+        if new_token.type == token.STRING and previous.type == token.INDENT:
+            new_class.docstring = Docstring(_strip(new_token.line_text, quotes=True))
+
+        if new_token.type == token.NAME and new_token.text == 'def':
+            function_ = _parse_def(tokens)
+            if function_.name == '__init__':
+                new_class.constructor = function_
+            else:
+                new_class.content.append(function_)
+
+        if new_token.type == token.DEDENT and new_token.e_col <= indent - 4:
+            return new_class
+
+        previous = new_token
+
+
+def _parse_module(tokens, module):
+    previous_type = token.INDENT
+
+    for infos in tokens:
+        new_token = Token(infos)
+
+        if previous_type == token.INDENT and new_token.type == token.STRING:
+            module.docstring = Docstring(_strip(new_token.line_text, quotes=True))
+
+        if new_token.type == token.NAME and new_token.text == 'class':
+            new_class = _parse_class(tokens)
+            module.content.append(new_class)
+
+        if new_token.type == token.NAME and new_token.text == 'def':
+            new_function = _parse_def(tokens)
+            module.content.append(new_function)
+
+        previous_type = new_token.type
+
+    return module
+
+
+def parse_module(filepath):
+    module = Module()
+    module.name = os.path.basename(filepath)
+
+    with open(filepath, 'r') as f_source:
+        tokens = tokenize.generate_tokens(f_source.readline)
+        module = _parse_module(tokens, module)
+
+    return module
