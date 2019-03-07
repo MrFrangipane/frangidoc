@@ -5,7 +5,6 @@ from frangidoc import api
 
 
 USAGE = """frangidoc <command> [<args>]
-- module <module_name>
 - git <repo_url> <output_dir>
 """
 

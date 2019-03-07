@@ -134,6 +134,10 @@ def clone_and_generate(repository_url, output_directory, cleanup=True):
         leaf = '/'.join([step for step in os.path.split(relative_path) if step != ''][1:])
         name = filename.replace('.py', '')
 
+        if module_filepath.endswiths('.md'):
+            shutil.copy2(module_filepath, os.path.join(output_folder, leaf, filename + '.md'))
+            continue
+
         # todo Deplacer cette logique dans 'generate_and_save()'
         # todo (pour que l'api soit consistante entre 'git' et 'module')
         if name == '__init__':
