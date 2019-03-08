@@ -10,7 +10,7 @@ import subprocess
 import git
 import yaml
 from frangidoc.parser import parse_module
-from frangidoc.renderer import render
+from frangidoc.renderer import render_full, render_summary
 
 
 def _handle_remove_read_only(func, path, exc):
@@ -29,17 +29,19 @@ def _save(filepath, content):
         f_file.write(content)
 
 
-def generate_and_save(module_filepath, output_filepath=None):
+def module_to_markdown(module_filepath):
     logging.info('Processing file : {}'.format(module_filepath))
 
     module = parse_module(module_filepath)
-    page = render(module)
+    page = render_full(module)
+    page += '\n\n# Summary'
+    page += '\n\n```text\n'
+    page += render_summary(module)
+    page += '\n```'
 
     logging.info('Processing done !')
 
-    _save(output_filepath, page)
-
-    logging.info("Output file written : %s" % output_filepath)
+    return module, page
 
 
 def _make_pythonpath_envvar():
@@ -143,12 +145,14 @@ def clone_and_generate(repository_url, output_directory, cleanup=True):
             path = os.path.dirname(path)
 
         if name == '__main__':
-            output_filename = os.path.join(output_folder, leaf, package_name + ' (CLI).md')
-            argparse_and_save(package_name, module_fullpath, output_filename)
+            output_filepath = os.path.join(output_folder, leaf, package_name + ' (CLI).md')
+            argparse_and_save(package_name, module_fullpath, output_filepath)
 
         else:
-            output_filename = os.path.join(output_folder, leaf, name + '.md')
-            generate_and_save(module_fullpath, output_filename)
+            output_filepath = os.path.join(output_folder, leaf, name + '.md')
+            module, page = module_to_markdown(module_fullpath)
+            _save(output_filepath, page)
+            logging.info("Output file written : %s" % output_filepath)
 
         sys.path = copy.deepcopy(sys_path_inter_backup)
 

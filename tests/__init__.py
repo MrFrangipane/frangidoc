@@ -1,6 +1,6 @@
 import logging
 from frangidoc.parser import parse_module
-from frangidoc.renderer import render
+from frangidoc.renderer import render_summary
 
 
 if __name__ == '__main__':
@@ -11,7 +11,7 @@ if __name__ == '__main__':
     logging.info('parsing ' + filepath)
 
     module = parse_module(filepath)
-    page = render(module)
+    page = render_summary(module)
 
     logging.info('done !')
 
