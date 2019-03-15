@@ -1,4 +1,5 @@
 import os
+import io
 import stat
 import errno
 import shutil
@@ -77,6 +78,45 @@ def _cleanup_folder(folder):
     os.makedirs(folder)
 
 
+def _handle_markdown(item, input_filepath, output_filepath):
+    '''
+    Handles a markdown file found in repo
+
+    If reading in utf-8 raises, falls back to latin-1
+
+    :param item: File
+    :param input_filepath: str
+    :param output_filepath: str
+    '''
+    logging.info("Copying markdown file {}".format(item.fullpath))
+
+    try:
+        with io.open(input_filepath, 'r', encoding='utf-8') as f_input:
+            content = f_input.read()
+    except UnicodeDecodeError as e:
+        with io.open(input_filepath, 'r', encoding='cp1250') as f_input:
+            content = f_input.read()
+
+    with io.open(output_filepath, 'w', encoding='utf-8') as f_output:
+        f_output.write(content)
+
+
+def _handle_python(item, input_filepath, output_filepath):
+    '''
+    Handles a python file found in repo
+
+    :param item: File
+    :param input_filepath: str
+    :param output_filepath: str
+    '''
+    logging.info("Generating markdown for {}".format(item.fullpath))
+
+    content = parser.parse_module(input_filepath)
+    markdown = renderer.render_full(content)
+    with open(output_filepath, 'w') as f_output:
+        f_output.write(markdown)
+
+
 def generate(repo_root, output_folder, item):
     '''
     Generates markdown files from .py and .md files discovered in `repo_root` folder,
@@ -91,25 +131,20 @@ def generate(repo_root, output_folder, item):
 
         input_filepath = str(Path(repo_root) / relative_fullpath)
 
-        output_filepath = Path(output_folder) / relative_fullpath
-        output_filepath = str(output_filepath).replace('.py', '.md')
+        output_filepath = str(Path(output_folder) / relative_fullpath)
+        output_filepath = output_filepath.replace('.py', '.md')
 
         if not os.path.exists(os.path.dirname(output_filepath)):
             os.makedirs(os.path.dirname(output_filepath))
 
         if os.path.exists(input_filepath):
             if input_filepath.endswith('.md'):
-                logging.info("Copying markdown file {}".format(item.fullpath))
-                shutil.copy2(input_filepath, str(output_filepath))
+                _handle_markdown(item, input_filepath, output_filepath)
 
             elif input_filepath.endswith('.py'):
-                logging.info("Generating markdown for {}".format(item.fullpath))
+                _handle_python(item, input_filepath, output_filepath)
 
-                content = parser.parse_module(input_filepath)
-                markdown = renderer.render_full(content)
-                with open(output_filepath, 'w') as f_output:
-                    f_output.write(markdown)
-
+    # recurse
     if isinstance(item, discover.Folder):
         for subitem in item.files:
             generate(repo_root, output_folder, subitem)
