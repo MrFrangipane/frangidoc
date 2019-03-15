@@ -1,2 +1,3 @@
 GitPython
 PyYaml
+pathlib2
