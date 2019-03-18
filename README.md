@@ -14,25 +14,35 @@ FrangiDoc is a command line tool
 
 It is possible to generate markdown from a distant repository.
 
-This repo must have a `.frangidoc.yml` file at its root, describing the modules/packages to be parsed :
-
-It is possible to alter the environment before generation.
-
-```yml
-title: The Title
-environment:
-  PYTHONPATH: some/path;some/other/path
-  SOME_ENV_VAR: some_value
-modules:
-  - path/to/module.py
-  - path/to/package/__init__.py
-markdown:
-  - path/to/markdown.md
-```
+The repo must have a `.frangidoc.yml` file at its root, describing the modules/packages to be parsed :
 
 ```bash
 python -m frangidoc git <repo_url> <output_dir>
 ```
+
+#### Configuration
+
+The `.frangidoc.yml` file contains
+- a title
+- include patterns (optionnal)
+- exclude patterns (optionnal)
+
+```yml
+title: The Title
+include:
+  - some/pattern
+  - a/pattern*/with-wildcar
+exclude:
+  - path/to/markdown.md
+```
+
+!!! note
+    If both patterns are specified : **include pattern** prevails on the exclude pattern
+    
+    i.e : `/frangidoc/*` is included, and `tests` is excluded. 
+    Only files matching `/frangidoc/*` **and not** matching `tests` will be parsed
+       
+
 
 Each given module will be parsed and a respective .md file will be created in the given output folder
 
@@ -98,7 +108,7 @@ def some_function(one_param):
 ### Markdown Output
 
 ````markdown
-# Demo
+#  Module demo.py
 
 Top module docstring
 
@@ -107,7 +117,11 @@ You can use markdown here
 - list
 - for example
 
-## Class **OneClass**
+###  class OneClass
+
+```python
+OneClass(self, arg_1, arg_2="default")
+```
 
 Class level docstring
 
@@ -117,53 +131,35 @@ You can use markdown here
 | --- | --- |
 | For | Example |
 
-### Constructor
+####  OneClass.a_method
 
 ```python
-OneClass(arg_1, arg_2='default')
-```
-
-Constructor docstring
-
-You can use markdown here too
-
-
-| Argument | Role |
-| --- | --- |
-| `arg_1` |  What is argument 1 |
-| `arg_2` |  What is argument 2 |
-
-### **a_method**
-
-```python
-OneClass.a_method(argument)
+OneClass.a_method(self, argument)
 ```
 
 Some text to describe the purpose of the method
 
 You can use markdown here too
 
-
 | Argument | Role |
-| --- | --- |
-| `argument` |  What is this argument |
-| Returns |  What the method returns |
+|---|---|
+| ` argument` |  What is this argument |
 
-## Functions
+**Returns** :  What the method returns
 
-
-### **some_function**
+###  some_function
 
 ```python
-demo_doc.some_function(one_param)
+some_function(one_param)
 ```
 
 Explain what happens here
 
 | Argument | Role |
-| --- | --- |
-| `one_param` |  Argument one **must be** something in bold |
-| Returns |  None |
+|---|---|
+| ` one_param` |  Argument one **must be** something in bold |
+
+**Returns** :  None
 ````
 
 ## References

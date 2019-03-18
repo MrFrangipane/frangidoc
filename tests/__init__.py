@@ -5,5 +5,5 @@ import frangidoc
 if __name__ == '__main__':
     logging.getLogger().setLevel(logging.INFO)
 
-    frangidoc.clone_and_generate('http://gitlab.cubedns.fr/cube/tube.git', 'D:/frangidoc/')
+    frangidoc.clone_and_generate('http://gitlab.cubedns.fr/v.moriceau/blender-lab.git', 'D:/frangidoc/')
     logging.info('done !')

@@ -1,4 +1,4 @@
-# Demo
+#  Module demo.py
 
 Top module docstring
 
@@ -7,7 +7,11 @@ You can use markdown here
 - list
 - for example
 
-## Class **OneClass**
+###  class OneClass
+
+```python
+OneClass(self, arg_1, arg_2="default")
+```
 
 Class level docstring
 
@@ -17,60 +21,43 @@ You can use markdown here
 | --- | --- |
 | For | Example |
 
-### Constructor
-
-```python
-OneClass(arg_1, arg_2='default')
-```
+#### Constructor
 
 Constructor docstring
 
 You can use markdown here too
 
-
 | Argument | Role |
-| --- | --- |
-| `arg_1` |  What is argument 1 |
-| `arg_2` |  What is argument 2 |
+|---|---|
+| ` arg_1` |  What is argument 1 |
+| ` arg_2` |  What is argument 2 |
 
-### **a_method**
+####  OneClass.a_method
 
 ```python
-OneClass.a_method(argument)
+OneClass.a_method(self, argument)
 ```
 
 Some text to describe the purpose of the method
 
 You can use markdown here too
 
-
 | Argument | Role |
-| --- | --- |
-| `argument` |  What is this argument |
-| Returns |  What the method returns |
+|---|---|
+| ` argument` |  What is this argument |
 
-## Functions
+**Returns** :  What the method returns
 
-
-### **some_function**
+###  some_function
 
 ```python
-demo_doc.some_function(one_param)
+some_function(one_param)
 ```
 
 Explain what happens here
 
 | Argument | Role |
-| --- | --- |
-| `one_param` |  Argument one **must be** something in bold |
-| Returns |  None |
+|---|---|
+| ` one_param` |  Argument one **must be** something in bold |
 
----
-
-If there is a `DISCLAIMER` member in the module, it is put at the end of the Markdown document
-
-It can be multiline and use markdown too
-
----
-
-Thank you
+**Returns** :  None

@@ -64,7 +64,7 @@ def _walk_folder(path_, exclude_function, parent=None):
     if exclude_function(here, Folder):
         return None
 
-    for item_name in sorted(os.listdir(path_)):
+    for item_name in sorted(os.listdir(path_), key=lambda x: x.lower()):
         item_path = os.path.join(path_, item_name)
 
         item = explore(item_path, exclude_function, parent=here)

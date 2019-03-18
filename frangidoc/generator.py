@@ -22,7 +22,7 @@ def _handle_remove_read_only(func, path, exc):
         os.chmod(path, stat.S_IRWXU | stat.S_IRWXG | stat.S_IRWXO)  # 0777
         func(path)
     else:
-        raise
+        raise 
 
 
 def _load_config(repo_root):

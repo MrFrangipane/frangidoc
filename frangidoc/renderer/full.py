@@ -17,6 +17,8 @@ _CLASS = """{title} class {name}
 
 {docstring}
 
+{constructor}
+
 {content}
 """
 
@@ -40,6 +42,14 @@ _FUNCTION = """{title} {name}
 
 
 def _render_docstring(docstring, parent, level):
+    """
+    Formats docstring arguments in a Markdown table
+
+    :param docstring: Docstring object
+    :param parent: Object
+    :param level: Not used
+    :return: str
+    """
     logging.info('Rendering docstring : {}'.format(parent.name))
     lines = docstring.content.splitlines()
     table = ['| Argument | Role |', '|---|---|']
@@ -98,6 +108,13 @@ def _render_class(class_, parent, level):
     name = class_.name
     signature = class_
     docstring = class_.docstring if class_.docstring else ''
+
+    if class_.constructor:
+        constructor = _title(level + 1) + 'Constructor\n'
+        constructor += render(class_.constructor.docstring, class_.constructor, level + 1)
+    else:
+        constructor = ''
+
     content = '\n'.join(render(item, class_, level + 1) for item in class_.content)
 
     logging.info('Rendering done      : {}'.format(class_.name))
@@ -106,6 +123,7 @@ def _render_class(class_, parent, level):
         title=title,
         name=name,
         signature=signature,
+        constructor=constructor,
         docstring=docstring,
         content=content
     ).strip()

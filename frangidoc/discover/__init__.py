@@ -21,19 +21,30 @@ def _config_to_regexp(config):
 
 
 def is_excluded_by_config(config, file):
+    '''
+    Applies include / exclude patterns from config
+    :param config: dict
+    :param file: a File object
+    :return: bool
+    '''
     if config is None:
         return False
 
-    include, exclude = _config_to_regexp(config)
+    includes, excludes = _config_to_regexp(config)
 
-    for pattern in include:
-        if pattern.findall(file.fullpath):
+    for include in includes:
+        if include.findall(file.fullpath):
+
+            for exclude in excludes:
+                if exclude.findall(file.fullpath):
+                    return True
+
             return False
 
-    if include:
+    if includes:
         return True
 
-    for pattern in exclude:
+    for pattern in excludes:
         if pattern.findall(file.fullpath):
             return True
 
