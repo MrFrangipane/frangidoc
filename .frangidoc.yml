@@ -1,0 +1,3 @@
+title: Frangidoc
+include:
+  - '/frangidoc/*.py'

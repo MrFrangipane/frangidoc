@@ -1,31 +1,89 @@
+import re
+
 from .explorer import File, Folder, explore, format_as_lines
 
 
-def _python_and_markdown(name, type_):
+
+def _config_to_regexp(config):
+    include = list()
+    exclude = list()
+
+    if config is None:
+        return include, exclude
+
+    for pattern in config.get('include', list()):
+        include.append(re.compile(pattern.replace('*', '.+')))
+
+    for pattern in config.get('exclude', list()):
+        exclude.append(re.compile(pattern.replace('*', '.+')))
+
+    return include, exclude
+
+
+def is_excluded_by_config(config, file):
+    if config is None:
+        return False
+
+    include, exclude = _config_to_regexp(config)
+
+    for pattern in include:
+        if pattern.findall(file.fullpath):
+            return False
+
+    if include:
+        return True
+
+    for pattern in exclude:
+        if pattern.findall(file.fullpath):
+            return True
+
+    return False
+
+
+def make_exclude_function(config):
     '''
-    Performs a filter on files and folders names
+    Makes the exclude function
 
     Excludes all files that are not `.py` or `.md`, and folders that starts with `__` or `.`
+    Excludes / includes files according to config patterns
 
-    :param name: name of the file / folder
-    :param type_: File or Folder
-    :return: bool
+    :param config: dict (typically, extracted from `.frangidoc.yml`)
+    :return: callable
     '''
-    if type_ == File and name.endswith(('.py', '.md')):
-        return False
 
-    elif type_ == Folder and not name.startswith(('.', '__')):
-        return False
+    def exclude_function(item, type_):
+        '''
+        Performs a filter on files and folders names
 
-    return True
+        Excludes all files that are not `.py` or `.md`, and folders that starts with `__` or `.`
+
+        If `True` is returned, the item will be excluded from exploration
+
+        :param item: File or Folder instance
+        :param type_: File or Folder class
+        :return: bool
+        '''
+        excluded = True
+
+        if type_ == File and item.name.endswith(('.py', '.md')):
+            if not is_excluded_by_config(config, item):
+                excluded = False
+
+        elif type_ == Folder and not item.name.startswith(('.', '__')):
+            excluded = False
+
+        return excluded
+
+    return exclude_function
 
 
-def discover(root):
+def discover(root, config=None):
     '''
-    Discovers all python and markdown files in the file tree
+    Discovers all python and markdown files in the file tree, according to configuration (include / exclude patterns)
 
     :param root: path to the root of the file tree, can be a path to a file
+    :param config: dict (typically, extracted from `.frangidoc.yml`)
     :return: Folder or File object
     '''
-    folder = explore(root, exclude_function=_python_and_markdown)
+    folder = explore(root, exclude_function=make_exclude_function(config))
     return folder

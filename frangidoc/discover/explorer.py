@@ -49,7 +49,7 @@ class Folder(object):
         return "<Folder('{}' {} file(s), {} folder(s))>".format(self.name, len(self.files), len(self.folders))
 
 
-def _walk_folder(path_, exclude_function):
+def _walk_folder(path_, exclude_function, parent=None):
     '''
     Recursively explores a Folder, given its root path and an exclude function
     
@@ -59,13 +59,15 @@ def _walk_folder(path_, exclude_function):
     '''
     name = os.path.basename(os.path.abspath(path_))
     here = Folder(name)
-    if exclude_function(here.name, Folder):
+    here.parent = parent
+
+    if exclude_function(here, Folder):
         return None
 
     for item_name in sorted(os.listdir(path_)):
         item_path = os.path.join(path_, item_name)
 
-        item = explore(item_path, exclude_function)
+        item = explore(item_path, exclude_function, parent=here)
         if item is None: continue
 
         item.parent = here
@@ -76,10 +78,13 @@ def _walk_folder(path_, exclude_function):
         if isinstance(item, Folder):
             here.folders.append(item)
 
+    if not here.files and not here.folders:
+        return None
+
     return here
 
 
-def explore(path_, exclude_function=lambda name, type_: False):
+def explore(path_, exclude_function=lambda item, type_: False, parent=None):
     '''
     Recursively explores given path or filepath
 
@@ -88,11 +93,12 @@ def explore(path_, exclude_function=lambda name, type_: False):
     '''
     if os.path.isfile(path_):
         file_ = File(os.path.basename(path_))
-        if not exclude_function(file_.name, File):
+        file_.parent = parent
+        if not exclude_function(file_, File):
             return file_
 
     if os.path.isdir(path_):
-        return _walk_folder(path_, exclude_function)
+        return _walk_folder(path_, exclude_function, parent=parent)
 
 
 def format_as_lines(item, _indent=0):
