@@ -20,6 +20,40 @@ The repo must have a `.frangidoc.yml` file at its root, describing the modules/p
 python -m frangidoc git <repo_url> <output_dir>
 ```
 
+All python (.py) and markdown (.md) files are recursively discovered in the repo (given rules in configuration).
+
+Each file will be parsed/copied to a respective .md file in the output folder. _Folders hierarchy is preserved_
+
+for example :
+
+```text
++ <repo root>
+    + example
+        - __init__.py
+        - __main__.py
+        - mylib.py
+        + mypackage
+            - __init__.py
+            - module_a.py
+            - module_b.py 
+    - readme.md 
+```
+
+will output :
+
+```text
++ <output folder>
+    + example
+        - __init__.md
+        - __main__.md
+        - mylib.md
+        + mypackage
+            - __init__.md
+            - module_a.md
+            - module_b.md
+    - readme.md 
+```
+
 #### Configuration
 
 The `.frangidoc.yml` file contains
@@ -33,18 +67,13 @@ include:
   - some/pattern
   - a/pattern*/with-wildcar
 exclude:
-  - path/to/markdown.md
+  - path/to/file.md
 ```
 
-!!! note
-    If both patterns are specified : **include pattern** prevails on the exclude pattern
+If both patterns are specified : **include pattern** prevails on the exclude pattern
     
-    i.e : `/frangidoc/*` is included, and `tests` is excluded. 
-    Only files matching `/frangidoc/*` **and not** matching `tests` will be parsed
-       
-
-
-Each given module will be parsed and a respective .md file will be created in the given output folder
+i.e : `/frangidoc/*` is included, and `tests` is excluded. 
+Only files matching `/frangidoc/*` **and not** matching `tests` will be parsed
 
 ## Syntax Examples
 
