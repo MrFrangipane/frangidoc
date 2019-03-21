@@ -52,22 +52,32 @@ def _render_docstring(docstring, parent, level):
     """
     logging.info('Rendering docstring : {}'.format(parent.name))
     lines = docstring.content.splitlines()
-    table = ['| Argument | Role |', '|---|---|']
+    table = ['| Argument | Role | Type |', '| --- | --- | --- |']
     output = list()
     return_info = list()
 
     for line in lines:
         if line.startswith(':param '):
-            name = line[6:].split(':')[0]
-            info = ':'.join(line[6:].split(':')[1:])
+            name = line[6:].split(':')[0].strip()
+            info = ':'.join(line[6:].split(':')[1:]).strip()
 
             table.append('| `{}` | {} |'.format(name, info))
 
+        elif line.startswith(':type '):
+            type_ = ':'.join(line[6:].split(':')[1:]).strip()
+            table[-1] += ' `{}` |'.format(type_)
+
         elif line.startswith(':return:'):
-            info = line[8:]
+            info = line[8:].strip()
             if info:
                 return_info.append('')
                 return_info.append('**Returns** : {}'.format(info))
+
+        elif line.startswith(':rtype:'):
+            type_ = line[7:].strip()
+            if type_:
+                return_info.append('')
+                return_info.append('`{}`'.format(type_))
 
         else:
             output.append(line)
@@ -170,3 +180,5 @@ def render(item, parent=None, level=0):
 
     if isinstance(item, Docstring):
         return '\n' + _render_docstring(item, parent, level)
+
+    return ''
