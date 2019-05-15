@@ -42,9 +42,13 @@ class FrangiDoc(object):
             type=str,
             help="Output directory"
         )
-        args = parser.parse_args(sys.argv[2:])
+        parser.add_argument(
+            '-i', '--include-images',
+            action='store_true'
+        )
 
-        api.clone_and_generate(args.url, args.output)
+        args = parser.parse_args(sys.argv[2:])
+        api.clone_and_generate(args.url, args.output, include_images=args.include_images)
 
 
 if __name__ == '__main__':

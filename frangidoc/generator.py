@@ -136,7 +136,7 @@ def generate(repo_root, output_directory):
 
     :param repo_root: str
     :param output_directory: str
-    :return: bool
+    :return: output_folder, read from configuration
     '''
     logging.info("Generating documentation")
     config = _load_config(repo_root)
@@ -154,4 +154,6 @@ def generate(repo_root, output_directory):
     for line in discover.format_as_lines(root_item):
         logging.info(line)
 
-    return convert(repo_root, output_folder, root_item)
+    convert(repo_root, output_folder, root_item)
+
+    return output_folder
