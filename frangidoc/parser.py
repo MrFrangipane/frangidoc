@@ -1,7 +1,8 @@
 import logging
 import os.path
-import token, tokenize
-from objects import *
+import token
+import tokenize
+from frangidoc.objects import *
 
 
 class Token(object):
@@ -42,9 +43,13 @@ def _strip(text, quotes=False):
     Strips indentation and quotes
     """
     text_ = ""
+    lines = text.splitlines()
+    if not lines: return text_
 
-    for line in text.splitlines():
-        line_ = line.strip()
+    indentation = len(lines[0]) - len(lines[0].lstrip())
+
+    for line in lines:
+        line_ = line[indentation:]
         if quotes:
             line_ = line_.strip('"').strip("'")
 
@@ -126,7 +131,7 @@ def _parse_def(tokens):
 def _parse_class(tokens):
     logging.info('New class')
     indent = None
-    new_token = Token(tokens.next())
+    new_token = Token(next(tokens))
     previous = new_token
 
     new_class = Class()
