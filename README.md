@@ -2,6 +2,8 @@
 
 Generate markdown from reST based Python docstrings
 
+**Project is now archived**
+
 ## Installation
 
 `pip install frangidoc`
